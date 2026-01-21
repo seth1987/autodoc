@@ -142,6 +142,76 @@ section h2 {
     accent-color: var(--primary);
 }
 
+/* PDF Modal */
+.modal-small {
+    max-width: 400px;
+}
+
+.modal-body {
+    padding: 20px 24px 24px;
+}
+
+.modal-body p {
+    margin-bottom: 20px;
+    color: var(--ink-light);
+}
+
+.pdf-options {
+    background: var(--paper-warm);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.btn-download-local {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 16px;
+    transition: background 0.2s;
+}
+
+.btn-download-local:hover {
+    background: var(--primary-dark);
+}
+
+.btn-download-local svg {
+    width: 20px;
+    height: 20px;
+}
+
+.install-hint {
+    font-size: 13px;
+    color: var(--ink-faded);
+    text-align: left;
+    margin: 0;
+    line-height: 1.8;
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--ink-light);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: var(--paper-warm);
+    border-color: var(--ink-faded);
+}
+
 /* Dropzone */
 .dropzone {
     border: 2px dashed var(--border);

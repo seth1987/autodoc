@@ -4,7 +4,8 @@
 
 // Configuration
 // Use localhost for development, Render URL for production
-const API_URL = window.location.hostname === 'localhost'
+const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_URL = IS_LOCAL
     ? 'http://localhost:8000'
     : 'https://autodoc-lc7x.onrender.com';
 
@@ -59,6 +60,9 @@ const elements = {
     previewModal: document.getElementById('preview-modal'),
     previewIframe: document.getElementById('preview-iframe'),
     modalClose: document.getElementById('modal-close'),
+    pdfModal: document.getElementById('pdf-modal'),
+    pdfModalClose: document.getElementById('pdf-modal-close'),
+    useHtmlInstead: document.getElementById('use-html-instead'),
 };
 
 // Initialize
@@ -102,11 +106,40 @@ function initializeEventListeners() {
     document.querySelectorAll('input[name="output-format"]').forEach(radio => {
         radio.addEventListener('change', handleFormatChange);
     });
+
+    // PDF modal buttons
+    if (elements.pdfModalClose) {
+        elements.pdfModalClose.addEventListener('click', closePdfModal);
+    }
+    if (elements.useHtmlInstead) {
+        elements.useHtmlInstead.addEventListener('click', () => {
+            closePdfModal();
+            document.querySelector('input[name="output-format"][value="html"]').checked = true;
+            handleFormatChange();
+        });
+    }
+    if (elements.pdfModal) {
+        elements.pdfModal.addEventListener('click', (e) => {
+            if (e.target === elements.pdfModal) closePdfModal();
+        });
+    }
 }
 
 function handleFormatChange() {
     const format = document.querySelector('input[name="output-format"]:checked').value;
     elements.btnText.textContent = format === 'pdf' ? 'Convertir en PDF' : 'Convertir en HTML';
+}
+
+function showPdfModal() {
+    if (elements.pdfModal) {
+        elements.pdfModal.style.display = 'flex';
+    }
+}
+
+function closePdfModal() {
+    if (elements.pdfModal) {
+        elements.pdfModal.style.display = 'none';
+    }
 }
 
 // Provider handling
@@ -229,6 +262,12 @@ async function handleConvert() {
     const model = elements.model.value;
     const baseUrl = elements.baseUrl.value.trim();
     const outputFormat = document.querySelector('input[name="output-format"]:checked').value;
+
+    // If PDF selected and not running locally, show download modal
+    if (outputFormat === 'pdf' && !IS_LOCAL) {
+        showPdfModal();
+        return;
+    }
 
     // Build LLM config
     const llmConfig = {

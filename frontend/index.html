@@ -148,6 +148,35 @@
         </div>
     </div>
 
+    <!-- PDF Local Install Modal -->
+    <div class="modal" id="pdf-modal" style="display: none;">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3>Export PDF</h3>
+                <button class="modal-close" id="pdf-modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <p>L'export PDF nécessite l'installation locale pour des raisons de performance.</p>
+                <div class="pdf-options">
+                    <a href="https://github.com/seth1987/autodoc/archive/refs/heads/main.zip" class="btn-download-local" download>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Télécharger AutoDoc (ZIP)
+                    </a>
+                    <p class="install-hint">
+                        1. Extraire le ZIP<br>
+                        2. Double-cliquer sur <strong>install.bat</strong><br>
+                        3. Double-cliquer sur <strong>start.bat</strong>
+                    </p>
+                </div>
+                <button class="btn-secondary" id="use-html-instead">Utiliser HTML à la place</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
