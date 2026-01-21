@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoDoc - Convertisseur de documents</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="logo">AutoDoc</h1>
+            <p class="tagline">Convertissez vos documents en rapports HTML professionnels</p>
+        </header>
+
+        <!-- Main content -->
+        <main class="main">
+            <!-- API Configuration -->
+            <section class="config-section">
+                <h2>Configuration API</h2>
+
+                <div class="form-group">
+                    <label for="provider">Provider LLM</label>
+                    <select id="provider" onchange="handleProviderChange()">
+                        <option value="openai">OpenAI</option>
+                        <option value="anthropic">Anthropic</option>
+                        <option value="custom">Custom (LM Studio, Ollama...)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="base-url-group" style="display: none;">
+                    <label for="base-url">URL de l'API</label>
+                    <input type="text" id="base-url" placeholder="http://localhost:1234">
+                    <small>Ex: http://localhost:1234 pour LM Studio</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="api-key">Clé API</label>
+                    <input type="password" id="api-key" placeholder="sk-...">
+                    <small>Votre clé n'est jamais stockée sur le serveur</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="model">Modèle</label>
+                    <select id="model">
+                        <!-- Options populated by JS based on provider -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Format de sortie</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="output-format" value="html" checked>
+                            <span>HTML</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="output-format" value="pdf">
+                            <span>PDF</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- File Upload -->
+            <section class="upload-section">
+                <h2>Document</h2>
+
+                <div class="dropzone" id="dropzone">
+                    <div class="dropzone-content">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        <p class="dropzone-text">Glissez-déposez votre fichier ici</p>
+                        <p class="dropzone-hint">ou cliquez pour sélectionner</p>
+                        <p class="dropzone-formats">PDF, DOCX acceptés (max 50 MB)</p>
+                    </div>
+                    <input type="file" id="file-input" accept=".pdf,.docx" hidden>
+                </div>
+
+                <div class="file-info" id="file-info" style="display: none;">
+                    <div class="file-details">
+                        <span class="file-name" id="file-name"></span>
+                        <span class="file-size" id="file-size"></span>
+                    </div>
+                    <button class="btn-remove" id="remove-file" title="Supprimer">×</button>
+                </div>
+            </section>
+
+            <!-- Convert Button -->
+            <button class="btn-convert" id="convert-btn" disabled>
+                <span class="btn-text">Convertir en HTML</span>
+                <span class="btn-loading" style="display: none;">
+                    <svg class="spinner" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="60" stroke-dashoffset="20"/>
+                    </svg>
+                    Conversion en cours...
+                </span>
+            </button>
+
+            <!-- Status Messages -->
+            <div class="status" id="status" style="display: none;">
+                <div class="status-icon"></div>
+                <div class="status-message" id="status-message"></div>
+            </div>
+
+            <!-- Result -->
+            <section class="result-section" id="result-section" style="display: none;">
+                <h2>Résultat</h2>
+                <div class="result-actions">
+                    <button class="btn-download" id="download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Télécharger HTML
+                    </button>
+                    <button class="btn-preview" id="preview-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        Prévisualiser
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>AutoDoc v1.0 — Vos données restent privées</p>
+        </footer>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal" id="preview-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Prévisualisation</h3>
+                <button class="modal-close" id="modal-close">×</button>
+            </div>
+            <iframe id="preview-iframe" class="preview-iframe"></iframe>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
