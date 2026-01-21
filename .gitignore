@@ -33,3 +33,4 @@ Thumbs.db
 # Temp files
 nul
 backend/=60.0
+response.json

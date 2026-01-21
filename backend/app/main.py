@@ -134,7 +134,7 @@ async def convert_document(
     # If PDF requested and HTML conversion succeeded, generate PDF
     if fmt == OutputFormat.PDF and result.success and result.html:
         try:
-            pdf_bytes = pdf_generator.generate_pdf(result.html)
+            pdf_bytes = await pdf_generator.generate_pdf_async(result.html)
             pdf_base64 = base64.b64encode(pdf_bytes).decode('utf-8')
             result.pdf_base64 = pdf_base64
             result.format = "pdf"

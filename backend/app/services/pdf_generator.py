@@ -1,19 +1,19 @@
-"""PDF generation service using WeasyPrint."""
+"""PDF generation service using Playwright for perfect rendering."""
 
-from weasyprint import HTML, CSS
-from weasyprint.text.fonts import FontConfiguration
-import io
+from playwright.sync_api import sync_playwright
+from concurrent.futures import ThreadPoolExecutor
+import asyncio
 
 
 class PDFGenerator:
-    """Service for converting HTML to PDF."""
+    """Service for converting HTML to PDF using headless browser."""
 
     def __init__(self):
-        self.font_config = FontConfiguration()
+        self._executor = ThreadPoolExecutor(max_workers=2)
 
-    def generate_pdf(self, html_content: str) -> bytes:
+    def _generate_pdf_sync(self, html_content: str) -> bytes:
         """
-        Convert HTML content to PDF.
+        Generate PDF synchronously using Playwright.
 
         Args:
             html_content: Complete HTML document string.
@@ -21,16 +21,46 @@ class PDFGenerator:
         Returns:
             PDF file as bytes.
         """
-        html = HTML(string=html_content)
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
 
-        pdf_buffer = io.BytesIO()
-        html.write_pdf(
-            pdf_buffer,
-            font_config=self.font_config
+            # Set content and wait for fonts to load
+            page.set_content(html_content, wait_until='networkidle')
+
+            # Generate PDF with print settings
+            pdf_bytes = page.pdf(
+                format='A4',
+                print_background=True,
+                margin={
+                    'top': '20mm',
+                    'bottom': '20mm',
+                    'left': '15mm',
+                    'right': '15mm'
+                }
+            )
+
+            browser.close()
+
+        return pdf_bytes
+
+    async def generate_pdf_async(self, html_content: str) -> bytes:
+        """
+        Generate PDF asynchronously by running sync code in thread pool.
+
+        Args:
+            html_content: Complete HTML document string.
+
+        Returns:
+            PDF file as bytes.
+        """
+        loop = asyncio.get_event_loop()
+        pdf_bytes = await loop.run_in_executor(
+            self._executor,
+            self._generate_pdf_sync,
+            html_content
         )
-
-        pdf_buffer.seek(0)
-        return pdf_buffer.read()
+        return pdf_bytes
 
 
 # Singleton instance
