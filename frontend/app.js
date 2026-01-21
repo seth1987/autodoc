@@ -3,7 +3,10 @@
  */
 
 // Configuration
-const API_URL = 'http://localhost:8000';
+// Use localhost for development, Render URL for production
+const API_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'
+    : 'https://autodoc-lc7x.onrender.com';
 
 // Model options per provider
 const MODEL_OPTIONS = {
